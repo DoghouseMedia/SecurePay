@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<package>
+    <name>SecurePay_SecureXML</name>
+    <version>1.0.8.8</version>
+    <stability>beta</stability>
+    <license uri="http://opensource.org/licenses/osl-3.0.php">Open Software License (OSL)</license>
+    <channel>community</channel>
+    <extends/>
+    <summary>Enables credit-card payments via the SecurePay gateway</summary>
+    <description>&lt;p&gt;The official &lt;a href="http://securepay.com.au"&gt;SecurePay Australia&lt;/a&gt; XML API plugin enables support in Magento for the following credit-card transactions:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;Standard Credit, when in Authorize + Capture mode&lt;/li&gt;&lt;li&gt;Preauth/Advice (Preauthorise + Complete), when in Authorize mode&lt;/li&gt;&lt;li&gt;Reverse (Void)&lt;/li&gt;&lt;li&gt;Refund&lt;/li&gt;&lt;li&gt;FraudGuard (Standard payment</description>
+    <notes>Provides support for the following kinds of credit-card transactions, via the SecurePay gateway:&#xD;
+    Standard payment&#xD;
+    Preauthorize&#xD;
+    Complete&#xD;
+    Void&#xD;
+    Refund&#xD;
+    FraudGuard (Standard</notes>
+    <authors><author><name>securepay</name><user>auto-converted</user><email>john.oflaherty@securepay.com.au</email></author></authors>
+    <date>2012-05-28</date>
+    <time>01:38:09</time>
+    <contents><target name="mage"><dir name="app"><dir name="code"><dir name="local"><dir name="SecurePay"><dir name="Sxml"><dir name="Block"><dir name="Form"><file name="Cc.php" hash="d58103847e7d12bc789f4044026b2c86"/></dir></dir><dir name="Helper"><file name="Data.php" hash="393c88c60eca919c13f255156355c536"/></dir><dir name="Model"><dir name="Source"><file name="Cctype.php" hash="586cbe08aca1387992e653945df20079"/></dir><dir name="Sxml"><file name="PaymentAction.php" hash="daf4ec3ebdf722093c44339418fc2dd3"/><file name="Request.php" hash="185f7afd0d9e60d0e123839494ebf0cc"/><file name="Result.php" hash="f3f463587b5293a897f5c7e2bd4fc139"/></dir><file name="Sxml.php" hash="3ba453b5185369f98db800ecb6845b6c"/><file name="Sxml.php.bak" hash="6dc598ca3a5e1569f2176f55a24d8951"/></dir><dir name="etc"><file name="config.xml" hash="dd49f7c65b4b2fbc1c091685e862501d"/><file name="system.xml" hash="afc354f541d449cea9e73b1fe736c2e8"/></dir></dir><file name="securexml.php" hash="6301605063446439ad93c7173bbc3b21"/></dir></dir></dir><dir name="design"><dir name="frontend"><dir name="default"><dir name="default"><dir name="template"><dir name="sxml"><dir name="form"><file name="cc.phtml" hash="60b85e42ab5e8a87c431915b24648c6b"/></dir></dir></dir></dir></dir></dir></dir><dir name="etc"><dir name="modules"><file name="SecurePay_Sxml.xml" hash="64fb2cfbcf4dff13ab19d6c5c997ebdc"/></dir></dir></dir></target></contents>
+    <compatible/>
+    <dependencies/>
+</package>
