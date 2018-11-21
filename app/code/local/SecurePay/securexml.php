@@ -979,10 +979,10 @@ class securexml_transaction
 		}
 		
 		$x =
-				'<?xml version="1.0" encoding="UTF-8" ?>'.
+            '<?xml version="1.0" encoding="UTF-8" ?>'.
 				'<SecurePayMessage>' .
 					'<MessageInfo>' .
-						'<messageID>' . htmlentities($this->getTxnReference() . date('His') . substr(current(split(' ',microtime())),2)) . '</messageID>' .
+						'<messageID>' . htmlentities($this->getTxnReference() . date('His') . substr(current(preg_split("/ /", microtime())),2)) . '</messageID>' .
 						'<messageTimestamp>' . htmlentities($this->getGMTTimeStamp()) . '</messageTimestamp>' . 
 						'<timeoutValue>' . htmlentities(self::TIMEOUT) . '</timeoutValue>' . 
 						'<apiVersion>' . $apiVer.'</apiVersion>' . 
