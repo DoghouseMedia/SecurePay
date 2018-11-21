@@ -1,0 +1,4 @@
+app/code/local/SecurePay/Sxml app/code/local/SecurePay/Sxml
+app/code/local/SecurePay/securexml.php app/code/local/SecurePay/securexml.php
+app/etc/modules/SecurePay_Sxml.xml app/etc/modules/SecurePay_Sxml.xml
+app/design/frontend/default/default/template/sxml/form/cc.phtml app/design/frontend/default/default/template/sxml/form/cc.phtml

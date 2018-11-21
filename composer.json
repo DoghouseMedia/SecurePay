@@ -1,9 +1,6 @@
 {
     "name": "doghouse/securepaysecurexml",
     "type": "magento-module",
-    "extra": {
-        "package-xml": "package.xml",
-    },
     "homepage": "https://github.com/DoghouseMedia/SecurePaySecureXml",
     "license":"OSL-3.0",
     "description":"Magento SecurePy Secure XML credit card verification module",
@@ -17,5 +14,8 @@
             "email":"bholman@dhmedia.com.au",
             "role": "Developer"
         }
-    ]
+    ],
+    "require": {
+        "magento-hackathon/magento-composer-installer": "*"
+    }
 }
