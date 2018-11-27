@@ -20,12 +20,12 @@ define('SECUREPAY_FRAUD_TEST',		 5);
 define('SECUREPAY_FRAUD_LIVE',		 6);
 
 /* Server URLs */
-define('SECUREPAY_URL_TEST', 			'https://test.securepay.com.au/xmlapi/payment');
-define('SECUREPAY_URL_LIVE', 			'https://www.securepay.com.au/xmlapi/payment');
-define('SECUREPAY_URL_PERIODIC_TEST', 	'https://test.securepay.com.au/xmlapi/periodic');
-define('SECUREPAY_URL_PERIODIC_LIVE', 	'https://www.securepay.com.au/xmlapi/periodic');
-define('SECUREPAY_URL_FRAUD_TEST', 		'https://test.securepay.com.au/antifraud/payment ');
-define('SECUREPAY_URL_FRAUD_LIVE', 		'https://www.securepay.com.au/antifraud/payment');
+define('SECUREPAY_URL_TEST',            'https://test.api.securepay.com.au/xmlapi/payment');
+define('SECUREPAY_URL_LIVE',            'https://api.securepay.com.au/xmlapi/payment');
+define('SECUREPAY_URL_PERIODIC_TEST',   'https://test.api.securepay.com.au/xmlapi/periodic');
+define('SECUREPAY_URL_PERIODIC_LIVE',   'https://api.securepay.com.au/xmlapi/periodic');
+define('SECUREPAY_URL_FRAUD_TEST',      'https://test.api.securepay.com.au/antifraud/payment');
+define('SECUREPAY_URL_FRAUD_LIVE',      'https://api.securepay.com.au/antifraud/payment');
 
 /* Transaction types. */
 define('SECUREPAY_TXN_STANDARD',		 0);
