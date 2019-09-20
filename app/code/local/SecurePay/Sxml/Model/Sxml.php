@@ -29,7 +29,7 @@ define('NO_ANTIFRAUD', 1);
  * The bulk of the SecurePay XML API payment module. It handles Preauth/Advice, Standard, Reverse and Refund transactions in the Magento application.
  */
 class SecurePay_Sxml_Model_Sxml extends Mage_Payment_Model_Method_Cc
-{	
+{
     protected $_code  = 'Sxml';
 
     protected $_isGateway               = true;
@@ -37,76 +37,77 @@ class SecurePay_Sxml_Model_Sxml extends Mage_Payment_Model_Method_Cc
     protected $_canCapture              = true;
     protected $_canCapturePartial       = true;
     protected $_canRefund               = true;
+    protected $_canRefundInvoicePartial = true;
     protected $_canVoid                 = true;
     protected $_canUseInternal          = true;
     protected $_canUseCheckout          = true;
     protected $_canUseForMultishipping  = true;
     protected $_canSaveCc               = false;
-	
+
 	protected $_formBlockType = 'SecurePay_Sxml_block_form_cc';
-	
+
     const STATUS_APPROVED = 'Approved';
 
 	const PAYMENT_ACTION_AUTH_CAPTURE = 'authorize_capture';
 	const PAYMENT_ACTION_AUTH = 'authorize';
-	
+
 	public function getDebug()
 	{
 		return Mage::getStoreConfig('payment/Sxml/debug');
 	}
-	
+
 	public function isFraudGuard()
 	{
 		return Mage::getStoreConfig('payment/Sxml/antifraud');
 	}
-	
+
 	public function getMode($forceNormal = 0)
 	{
 		$fraud = $forceNormal ? 0 : $this->isFraudGuard();
-		
+
 		if(Mage::getStoreConfig('payment/Sxml/test'))
 		{
 			return $fraud ? SECUREPAY_FRAUD_TEST : SECUREPAY_TEST;
 		}
-		
+
 		return $fraud ? SECUREPAY_FRAUD_LIVE : SECUREPAY_LIVE;
 	}
-	
+
 	public function getLogPath()
 	{
 		return Mage::getBaseDir() . '/var/log/Sxml.log';
 	}
-	
+
 	public function getUsername()
 	{
 		return trim(Mage::getStoreConfig('payment/Sxml/username'));
 	}
-	
+
 	public function getPassword()
 	{
 		return trim(Mage::getStoreConfig('payment/Sxml/password'));
 	}
-	
+
 	public function getCCVStatus()
 	{
 		return Mage::getStoreConfig('payment/Sxml/usecvv');
 	}
-	
+
 	public function getCurrency()
 	{
 		return $this->getInfoInstance()->getQuote()->getBaseCurrencyCode();
 	}
-	
+
 	public function getCheckout()
 	{
 		return Mage::getSingleton('checkout/session');
 	}
-	
+
 	public function getQuote()
 	{
 		return $this->getCheckout()->getQuote();
 	}
-	
+
 	/**
 	 * validate
 	 *
@@ -124,10 +125,10 @@ class SecurePay_Sxml_Model_Sxml extends Mage_Payment_Model_Method_Cc
 	    	$writer = new Zend_Log_Writer_Stream($this->getLogPath());
 			$logger = new Zend_Log($writer);
 		}
-		
+
         //parent::validate();
         $paymentInfo = $this->getInfoInstance();
-		
+
         if ($paymentInfo instanceof Mage_Sales_Model_Order_Payment)
 		{
             $currency_code = $paymentInfo->getOrder()->getBaseCurrencyCode();
@@ -136,10 +137,10 @@ class SecurePay_Sxml_Model_Sxml extends Mage_Payment_Model_Method_Cc
 		{
             $currency_code = $paymentInfo->getQuote()->getBaseCurrencyCode();
         }
-		
+
         return $this;
     }
-	
+
 	/**
 	 * authorize
 	 *
@@ -157,25 +158,25 @@ class SecurePay_Sxml_Model_Sxml extends Mage_Payment_Model_Method_Cc
 			$writer = new Zend_Log_Writer_Stream($this->getLogPath());
 			$logger = new Zend_Log($writer);
 		}
-		
+
 		$approved = true;
 		$transaction_id = $payment->getOrder()->getIncrementId();
-		
+
 		if($this->isFraudGuard())
 		{
 			//Create the fraudguard transaction object
 			$sxml = new securexml_transaction ($this->getMode(),$this->getUsername(),$this->getPassword());
 			//Populate fraud-check with user's details, if available
-			
+
 			$shipping_address = $this->getQuote()->getShippingAddress();
 			$billing_address = $this->getQuote()->getBillingAddress();
-			
+
 			$sxml->initFraud($_SERVER['REMOTE_ADDR'], $billing_address->getFirstname(), $billing_address->getLastname(), $billing_address->getPostcode(), $billing_address->getCity(), $billing_address->getCountry(), $shipping_address->getCountry(), $billing_address->getEmail());
-			
+
 			//Issue check
 			$approved = $sxml->processCreditFraudCheck($amount, $transaction_id, $payment->getCcNumber(), $payment->getCcExpMonth(), $payment->getCcExpYear(), $payment->getCcCid(), Mage::app()->getStore()->getBaseCurrency()->getCurrencyCode());
 		}
-		
+
 		if($approved)
 		{
 			//Get the preauth transaction object
@@ -183,13 +184,13 @@ class SecurePay_Sxml_Model_Sxml extends Mage_Payment_Model_Method_Cc
 			//Issue the preauth
 			$approved = $sxml->processPreauth($amount, $transaction_id, $payment->getCcNumber(), $payment->getCcExpMonth(), $payment->getCcExpYear(), $payment->getCcCid(), Mage::app()->getStore()->getBaseCurrency()->getCurrencyCode());
 		}
-		
+
 		if($approved)
 		{
 			$preauth_id = $sxml->getResult('preauth_id');
 			$payment->setCcTransId(''.$preauth_id);
 			$payment->setTransactionId(''.$preauth_id);
-			
+
 			if($this->getDebug())
 			{
 				$logger->info("Preauth Approved. #: " . $payment->getCcTransId());
@@ -198,18 +199,18 @@ class SecurePay_Sxml_Model_Sxml extends Mage_Payment_Model_Method_Cc
 		else
 		{
 			$error = $sxml->getError();
-			
+
 			if($this->getDebug())
 			{
 				$logger->info("Preauth Declined. " . $error . $sxml->getResult('request'));
 			}
-			
+
 			Mage::throwException("" . $error);
 		}
-		
+
 		return $this;
 	}
-	
+
 	/**
 	 * capture
 	 *
@@ -233,11 +234,11 @@ class SecurePay_Sxml_Model_Sxml extends Mage_Payment_Model_Method_Cc
 			$writer = new Zend_Log_Writer_Stream($this->getLogPath());
 			$logger = new Zend_Log($writer);
 		}
-		
+
 		$preauth = $payment->getCcTransId();
-		
+
 		$txnType = "Advice";
-		
+
 		if(!$preauth)
 		{
 			if($payment->getCcExpYear())
@@ -253,12 +254,12 @@ class SecurePay_Sxml_Model_Sxml extends Mage_Payment_Model_Method_Cc
 				Mage::throwException("CC details missing.");
 			}
 		}
-		
+
 		//Create the transaction object
 		$sxml = new securexml_transaction($this->getMode(NO_ANTIFRAUD), $this->getUsername(), $this->getPassword());
-		
+
 		$transaction_id = $payment->getOrder()->getIncrementId();
-		
+
 		if($txnType == "Advice")
 		{
 			//Issue an advice transaction
@@ -272,9 +273,9 @@ class SecurePay_Sxml_Model_Sxml extends Mage_Payment_Model_Method_Cc
 				$sxml = new securexml_transaction ($this->getMode(),$this->getUsername(),$this->getPassword());
 				$shipping_address = $this->getQuote()->getShippingAddress();
 				$billing_address = $this->getQuote()->getBillingAddress();
-				
+
 				$sxml->initFraud($_SERVER['REMOTE_ADDR'], $billing_address->getFirstname(), $billing_address->getLastname(), $billing_address->getPostcode(), $billing_address->getCity(), $billing_address->getCountry(), $shipping_address->getCountry(), $billing_address->getEmail());
-				
+
 				$approved = $sxml->processCreditFraud($amount, $transaction_id, $payment->getCcNumber(), $payment->getCcExpMonth(), $payment->getCcExpYear(), $payment->getCcCid(), Mage::app()->getStore()->getBaseCurrency()->getCurrencyCode());
 			}
 			else
@@ -283,7 +284,7 @@ class SecurePay_Sxml_Model_Sxml extends Mage_Payment_Model_Method_Cc
 				$approved = $sxml->processCredit($amount, $transaction_id, $payment->getCcNumber(), $payment->getCcExpMonth(), $payment->getCcExpYear(), $payment->getCcCid(), Mage::app()->getStore()->getBaseCurrency()->getCurrencyCode());
 			}
 		}
-		
+
 		if($approved)
 		{
 			$transaction_id = $sxml->getResult('transaction_id');
@@ -297,18 +298,18 @@ class SecurePay_Sxml_Model_Sxml extends Mage_Payment_Model_Method_Cc
 		else
 		{
 			$error = $sxml->getError();
-			
+
 			if($this->getDebug())
 			{
 				$logger->info("Advice/Standard Declined. " . $error);
 			}
-			
+
 			Mage::throwException("" . $error);
 		}
-		
+
 		return $this;
 	}
-	
+
 	/**
 	 * void
 	 *
@@ -327,32 +328,32 @@ class SecurePay_Sxml_Model_Sxml extends Mage_Payment_Model_Method_Cc
 			$logger = new Zend_Log($writer);
 		}
 		$amount = $payment->getOrder()->getData('grand_total');
-		
+
 		$bankRespID = $payment->getCcTransId();
-		
+
 		if(!$bankRespID)
 		{
 			Mage::throwException("Cannot issue a void on this transaction: bank response id is missing.");
 		}
-		
+
 		if(!$amount)
 		{
 			Mage::throwException("Cannot issue a void on this transaction: transaction amount is missing.");
 		}
-		
+
 		//Create the transaction object
 		$sxml = new securexml_transaction ($this->getMode(NO_ANTIFRAUD),$this->getUsername(),$this->getPassword());
-		
+
 		$transaction_id = $payment->getOrder()->getIncrementId();
-		
+
 		//Issue a reverse transaction
 		if($sxml->processReverse($amount,$transaction_id,$bankRespID))
 		{
 			$transaction_id = $sxml->getResult('transaction_id');
-			
+
 			$payment->setCcTransId(''.$transaction_id);
 			$payment->setTransactionId(''.$transaction_id);
-			
+
 			if($this->getDebug())
 			{
 				$logger->info( "Reverse Approved. Response ID: ".$transaction_id );
@@ -361,18 +362,18 @@ class SecurePay_Sxml_Model_Sxml extends Mage_Payment_Model_Method_Cc
 		else
 		{
 			$error = $sxml->getError();
-			
+
 			if($this->getDebug())
 			{
 				$logger->info("Reverse Declined. ".$error);
 			}
-			
+
 			Mage::throwException("" . $error);
 		}
-		
+
 		return $this;
 	}
-	
+
 	/**
 	 * refund
 	 *
@@ -390,42 +391,42 @@ class SecurePay_Sxml_Model_Sxml extends Mage_Payment_Model_Method_Cc
 			$writer = new Zend_Log_Writer_Stream($this->getLogPath());
 			$logger = new Zend_Log($writer);
 		}
-		
+
 		$bankRespID = $payment->getCcTransId();
-		
+
 		if(!$bankRespID)
 		{
 			Mage::throwException("Cannot issue a refund on this transaction: bank response id is missing.");
 		}
-		
+
 		//Create the transaction object
 		$sxml = new securexml_transaction ($this->getMode(NO_ANTIFRAUD), $this->getUsername(), $this->getPassword());
-		
+
 		$transaction_id = $payment->getOrder()->getIncrementId();
-		
+
 		if($sxml->processRefund($amount,$transaction_id,$bankRespID))
 		{
 			$transaction_id = $sxml->getResult('transaction_id');
-			
+
 			if($this->getDebug())
 			{
 				$logger->info( "Refund Approved. Response ID: ".$transaction_id );
 			}
-			
+
 			/* Don't reset $payment->CcTransId for refunds, so that more than one is possible. This means that the gateway response id ($transaction_id) is not stored here. If necessary, it can be recovered from the SecurePay Merchant Management Facility. http://securepay.com.au */
 		}
 		else
 		{
 			$error = $sxml->getError();
-			
+
 			if($this->getDebug())
 			{
 				$logger->info("Refund Declined. ".$error);
 			}
-			
+
 			Mage::throwException("" . $error);
 		}
-		
+
 		return $this;
 	}
 }
