@@ -402,7 +402,11 @@ class SecurePay_Sxml_Model_Sxml extends Mage_Payment_Model_Method_Cc
 		//Create the transaction object
 		$sxml = new securexml_transaction ($this->getMode(NO_ANTIFRAUD), $this->getUsername(), $this->getPassword());
 
-		$transaction_id = $payment->getOrder()->getIncrementId();
+        $order = $payment->getOrder();
+
+        Mage::getSingleton('core/session')->setRefundOrderStatus($order->getState());
+
+        $transaction_id = $order->getIncrementId();
 
 		if($sxml->processRefund($amount,$transaction_id,$bankRespID))
 		{
