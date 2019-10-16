@@ -404,7 +404,8 @@ class SecurePay_Sxml_Model_Sxml extends Mage_Payment_Model_Method_Cc
 
         $order = $payment->getOrder();
 
-        Mage::getSingleton('core/session')->setRefundOrderStatus($order->getState());
+        Mage::getSingleton('core/session')->setRefundOrderStatus($order->getStatus());
+        Mage::getSingleton('core/session')->setRefundOrderState($order->getState());
 
         $transaction_id = $order->getIncrementId();
 
